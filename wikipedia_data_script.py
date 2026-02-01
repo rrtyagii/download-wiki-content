@@ -32,7 +32,7 @@ HEADERS = {
     'User-Agent': f"{WIKIMEDIA_USER_AGENT}",
 }
 
-def load_existing_keys(filePath="keys.json"):
+def load_existing_keys(filePath="seed.json"):
     try:
         with open(filePath, "r") as f:
             data = json.load(f)
@@ -40,7 +40,7 @@ def load_existing_keys(filePath="keys.json"):
     except (FileNotFoundError, json.JSONDecodeError):
         return set(), []
 
-def save_keys(data, filepath="keys.json"):
+def save_keys(data, filepath="seed.json"):
     with open(filepath, "w") as f:
         json.dump(data, f, indent=4)
 
@@ -64,12 +64,12 @@ def search_pages_from_wiki(query:str, limit:int, offset:int):
     return response.json()
 
 
-def search_pages_request_manager():
+def search_pages_request_manager(query:str):
     try:
         (keys_set, json_output) = load_existing_keys()
         
-        for offset in range(0, 4001, 100):
-            data = search_pages_from_wiki("Artificial Intelligence", 100, offset)
+        for offset in range(0, 2001, 100):
+            data = search_pages_from_wiki(query, 100, offset)
 
             if not data or 'pages' not in data:
                 break
@@ -82,8 +82,10 @@ def search_pages_request_manager():
 
             for page in pages:
                 key = page['key']
+                print("Key found in page : ", key)
                 id = page['id']
                 if key not in keys_set:
+                    print(f"Adding key: { key }  to the set : ")
                     keys_set.add(key)
                     json_output.append({
                         "id": id,
@@ -97,20 +99,47 @@ def search_pages_request_manager():
     except Exception as e:
             print(f"An unexpected error occurred during search_pages_equest_manager:\n {e}")
     finally:
-        print(f"Saving {len(json_output)} total keys to keys.json...")
+        print(f"Saving {len(json_output)} total keys to seed.json...")
         save_keys(json_output)
 
-#search_pages_request_manager()
+# searched seed with the following queries:
+# 1. Deep Learning
+# 2. Artificial Intelligence
+# 3. Machine Learning
+# 4. Generative Pre-trained Transformer
+# 5. Neural_network_(machine_learning)
+# 6. Computer Vision
 
-def fetch_content(title:str):
+search_pages_request_manager("Computer Vision") 
+
+def fetch_content(
+        title:str, 
+        with_html=True
+    ):
     fetch_content = endpoints["fetch_content"]
 
     # need to fetch html, parse via beautifulSoup, do it for the rest of the links on the HTML page with a "delay" to not touch rate limits.
-    req_url = f"{BASE_URL}/{fetch_content['provider']}/{fetch_content['language']}/{fetch_content['endpoint']}/{title}/with_html"
 
-    response = requests.get(req_url, headers=HEADERS)
-    print(response.json())
+    req_url = f"{BASE_URL}/{fetch_content['provider']}/{fetch_content['language']}/{fetch_content['endpoint']}/{title}"
+
+    if with_html:
+        req_url = req_url + "/with_html"
+    else:
+        req_url = req_url + "/bare"
+
+    try:
+        response = requests.get(req_url, headers=HEADERS)
+        response.raise_for_status()
+    except requests.exceptions.RequestException as reqEx:
+        print("request failed due to an exception:", reqEx)
+        return None
+
+    if response.status_code != 200:
+        print("Something went wrong:", response.status_code)
+    
+    
 
 
-fetch_content("Artificial_intelligence")
+
+#fetch_content("Artificial_intelligence")
 
