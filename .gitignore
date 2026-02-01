@@ -1,0 +1,6 @@
+*.env.*
+*.env
+keys.json
+
+.vscode/
+.venv/

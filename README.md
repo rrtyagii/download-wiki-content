@@ -1,0 +1,1 @@
+A basic script to download content / articles for our other project [Infomatic](https://github.com/rrtyagii/refactored-rotary-phone).
