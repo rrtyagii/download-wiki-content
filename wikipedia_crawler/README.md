@@ -10,20 +10,6 @@ links of links -> depth = 2
 
 We hit the wiki api, politely, check relevancy, store the content, and update our queues - links we have visited, and linke we need to visit. We are saving a progress-report in case of an error, key-interuppt or completion.
 
-## Overview
-
-- Starts from seed URLs (see `seed.json`) and crawls internal Wikipedia links only.
-- Depth-limited crawling: seed URL = depth 0, links from seed = depth 1, links-of-links = depth 2.
-- Uses a worker to fetch and parse page content, extract links, and apply relevancy filtering via keywords.
-- Stores article text in `corpus/` and records progress in `progress.json` to support resuming.
-
-## Features
-
-- Wikipedia-only links
-- Relevancy filtering with configurable keywords
-- Max articles: 4,000 (configurable in code)
-- Safe/resumable: saves `progress.json` periodically
-
 ## Prerequisites
 
 - Python 3.10+ (or compatible 3.x)
@@ -50,6 +36,7 @@ Create a `.env.development` in the project root with your token values:
 WIKIPEDIA_CLIENT_ID=your_client_id
 WIKIPEDIA_CLIENT_SECRET=your_client_secret
 WIKIPEDIA_ACCESS_TOKEN=your_access_token
+WIKIPEDIA_USER_AGENT=<app_name>/<app_version> (<contact_email@abc.com>)'
 ```
 
 If your token has specific scopes, ensure the correct scopes are enabled in the API portal.
@@ -75,6 +62,3 @@ Open issues or PRs to improve parsing, add keywords, or change crawl limits. Whe
 
 - MIT — see [LICENSE.txt](LICENSE.txt) for full terms.
 - Open an issue in this repository for questions or support.
-
-
-
