@@ -36,6 +36,7 @@ Create a `.env.development` in the project root with your token values:
 WIKIPEDIA_CLIENT_ID=your_client_id
 WIKIPEDIA_CLIENT_SECRET=your_client_secret
 WIKIPEDIA_ACCESS_TOKEN=your_access_token
+WIKIPEDIA_USER_AGENT=<app_name>/<app_version> (<contact_email@abc.com>)'
 ```
 
 If your token has specific scopes, ensure the correct scopes are enabled in the API portal.
