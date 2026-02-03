@@ -33,9 +33,6 @@ HEADERS = {
     'User-Agent': f"{WIKIMEDIA_USER_AGENT}",
 }
 
-def convert_wikipedia_key_into_file_safe(text):
-    return re.sub(r'[^\w\s-]', '_', text).strip()
-
 def load_existing_keys(filePath="seed.json"):
     try:
         with open(filePath, "r") as f:
@@ -48,6 +45,9 @@ def save_keys(data, filepath="seed.json"):
     with open(filepath, "w") as f:
         json.dump(data, f, indent=4)
 
+def convert_wikipedia_key_into_file_safe(text):
+    return re.sub(r'[^\w\s-]', '_', text).strip()
+
 def save_checkpoint(seen, queue, filepath):
     with open(filepath, "w") as f:
         json.dump({
@@ -56,7 +56,7 @@ def save_checkpoint(seen, queue, filepath):
         }, f, indent=4)
     print(f"Checkpoint saved to {filepath}")
 
-def search_pages_from_wiki(query:str, limit:int, offset:int): 
+def prepare_seed_urls(query:str, limit:int, offset:int): 
     search_page_endpoint = endpoints["search_page"]
 
     req_url = f"{BASE_URL}/{search_page_endpoint['provider']}/{search_page_endpoint['language']}/{search_page_endpoint['endpoint']}"
@@ -84,12 +84,12 @@ def search_pages_from_wiki(query:str, limit:int, offset:int):
 # 5. Neural_network_(machine_learning)
 # 6. Computer Vision
 #
-def search_pages_request_manager(query:str):
+def seed_url_manager(query:str):
     try:
         (keys_set, json_output) = load_existing_keys()
         
         for offset in range(0, 2001, 100):
-            data = search_pages_from_wiki(query, 100, offset)
+            data = prepare_seed_urls(query, 100, offset)
 
             if not data or 'pages' not in data:
                 break
