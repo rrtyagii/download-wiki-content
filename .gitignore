@@ -3,3 +3,6 @@
 
 .vscode/
 .venv/
+corpus/
+
+.DS_Store
